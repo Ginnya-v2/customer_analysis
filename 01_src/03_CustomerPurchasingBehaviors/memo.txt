@@ -1,0 +1,3 @@
+出典
+  https://www.kaggle.com/datasets/hanaksoy/customer-purchasing-behaviors
+  License CC BY-SA 4.0
