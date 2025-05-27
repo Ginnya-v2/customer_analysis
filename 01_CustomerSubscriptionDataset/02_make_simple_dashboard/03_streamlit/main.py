@@ -1,10 +1,20 @@
 import streamlit as st
 import pandas as pd
-import io
+import os
 import matplotlib.pyplot as plt
-plt.rcParams['font.family'] = 'Hiragino Sans' #日本語フォントを指定（Mac）
+from matplotlib import font_manager
+# plt.rcParams['font.family'] = 'Hiragino Sans' #日本語フォントを指定（Mac）
 # plt.rcParams['font.family'] = 'MS Gothic' #日本語フォントを指定（Windows）
 
+# フォントパスを指定
+font_path = os.path.join(os.path.dirname(__file__), "Zen_Kaku_Gothic_New", "ZenKakuGothicNew-Regular.ttf")
+
+# フォントプロパティを作成
+font_prop = font_manager.FontProperties(fname=font_path)
+
+# matplotlib にフォントを登録・適用
+plt.rcParams['font.family'] = font_prop.get_name()
+print(font_prop.get_name())
 
 
 
@@ -14,8 +24,8 @@ def create_card(title, value, width=4, height=1, color='#0017C1'):
     fig = plt.figure(figsize=(width, height))
     fig.patch.set_facecolor(color)
     plt.axis('off')
-    plt.text(0.5, 0.8, title, ha='center', fontsize=14, color='white')
-    plt.text(0.5, 0.1, f"{value:,}", ha='center', fontsize=24, color='white')
+    plt.text(0.5, 0.8, title, ha='center', fontsize=14, color='white',fontproperties=font_prop)
+    plt.text(0.5, 0.1, f"{value:,}", ha='center', fontsize=24, color='white',fontproperties=font_prop)
     return fig
 
 # ドーナッツグラフ作成関数
@@ -34,12 +44,17 @@ def create_donut_chart(data, title, labels, colors, font_colors=None, width=4, h
     )
 
     ax.axis('equal')
-    ax.set_title(title)
+    ax.set_title(title,fontproperties=font_prop)
 
     # フォントカラーの設定
     if font_colors:
         for autotext, color in zip(autotexts, font_colors):
             autotext.set_color(color)
+
+    # テキストのフォントサイズとプロパティを設定        
+    for text in texts:
+        text.set_fontsize(5)
+        text.set_fontproperties(font_prop)
 
     # 🔶 図（fig）の周囲に枠線を追加
     fig.patch.set_edgecolor('#0017C1')   # 枠線の色
@@ -58,9 +73,14 @@ def create_bar_chart(labels, sizes_percent, width=2, height=1):
         color='#0017C1'       # 棒の色
     )
 
-    ax.set_title('年代別構成比')     # タイトル
-    ax.set_xlabel('年代')           # 横軸ラベル
-    ax.set_ylabel('構成比 (%)')     # 縦軸ラベル
+    ax.set_title('年代別構成比',fontproperties=font_prop)     # タイトル
+    ax.set_xlabel('年代',fontproperties=font_prop)           # 横軸ラベル
+    ax.set_ylabel('構成比 (%)',fontproperties=font_prop)     # 縦軸ラベル
+
+    # 🔸 軸の目盛（tick）にフォント適用
+    for label in ax.get_xticklabels():
+        label.set_fontproperties(font_prop)
+        label.set_fontsize(7)
 
     # 軸目盛のフォントサイズ調整
     ax.tick_params(axis='both', labelsize=5)
@@ -84,9 +104,9 @@ def create_line_chart(months, sizes_2019, sizes_2020, sizes_2021, width=5, heigh
     ax.plot(months, sizes_2020, color='#4979F5', marker='d', markersize=2, linewidth=1, label='2020年')
     ax.plot(months, sizes_2019, color='#9DB7F9', marker='d', markersize=2, linewidth=1, label='2019年')
 
-    ax.set_title('月別件数推移', fontsize=6)
-    ax.set_xlabel('月', fontsize=5)
-    ax.set_ylabel('件数', fontsize=5)
+    ax.set_title('月別件数推移', fontsize=6,fontproperties=font_prop)
+    ax.set_xlabel('月', fontsize=5,fontproperties=font_prop)
+    ax.set_ylabel('件数', fontsize=5,fontproperties=font_prop)
 
     ax.set_ylim(bottom=0)
     ax.tick_params(axis='x', labelsize=4, rotation=45)
@@ -97,7 +117,17 @@ def create_line_chart(months, sizes_2019, sizes_2020, sizes_2021, width=5, heigh
     fig.tight_layout()
     fig.patch.set_edgecolor('#0017C1')
     fig.patch.set_linewidth(0.5)
+    
+    # 凡例を作成しフォントを適用
+    legend = ax.legend(loc='upper left', bbox_to_anchor=(1.0, 1.0), fontsize=5)
+    for text in legend.get_texts():
+        text.set_fontproperties(font_prop)
+        text.set_fontsize(5)
 
+    # 🔸 軸の目盛（tick）にフォント適用
+    for label in ax.get_xticklabels():
+        label.set_fontproperties(font_prop)
+        label.set_fontsize(4)
     return fig
 
 def render_matplotlib_fig(fig, width=None, use_column_width=True, dpi=200):
@@ -108,7 +138,7 @@ def render_matplotlib_fig(fig, width=None, use_column_width=True, dpi=200):
 
     # 横幅指定とカラムフィットは排他的（両方は不可）
     if use_column_width:
-        st.image(buf, use_column_width=True)
+        st.image(buf, use_container_width=True)
     else:
         st.image(buf, width=width)
 
@@ -223,7 +253,7 @@ col2_1, col2_2, col2_3 = st.columns(3)
 # ドーナッツグラフ（性別構成比）
 with col2_1:
     grouped = df_filtered.groupby('性別')['件数'].sum()
-    st.pyplot(create_donut_chart(
+    fig = create_donut_chart(
         data=grouped.values,
         title="性別構成比",
         labels=grouped.index.tolist(),
@@ -231,7 +261,8 @@ with col2_1:
         font_colors=['white', 'black'],
         width=3,
         height=3
-    ))
+    )
+    render_matplotlib_fig(fig, use_column_width=True)  # ← ここで余白を持たせた描画
 
 # ドーナッツグラフ（商品別構成比）
 with col2_2:
