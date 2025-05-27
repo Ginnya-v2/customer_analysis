@@ -117,7 +117,7 @@ def render_matplotlib_fig(fig, width=None, use_column_width=True, dpi=200):
 
 
 #~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ データの読み込み ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-df = pd.read_csv('../00_dataset/data.csv') #データが配置されている場所を指定
+df = pd.read_csv('https://raw.githubusercontent.com/Ginnya-v2/customer_analysis/refs/heads/master/01_CustomerSubscriptionDataset/02_make_simple_dashboard/00_dataset/data.csv') #データが配置されている場所を指定
 
 
 
@@ -203,8 +203,8 @@ with col1_2:
         st.write('性別')
         st.write('商品')
     with col1_2_2:
-        st.badge("、".join(sex_options)) # 選択された性別を表示
-        st.badge("、".join(product_options)) # 選択された商品を表示
+        st.badge("、".join(selected_sex)) # 選択された性別を表示
+        st.badge("、".join(selected_product)) # 選択された商品を表示
 
 # フィルタ条件の表示（年代、年）
 with col1_3:
@@ -213,8 +213,8 @@ with col1_3:
         st.write('年代')
         st.write('年')
     with col1_3_2:
-        st.badge("、".join(age_options)) # 選択された年代を表示
-        st.badge("、".join(year_options)) # 選択された年を表示
+        st.badge("、".join(selected_age)) # 選択された年代を表示
+        st.badge("、".join(selected_year)) # 選択された年を表示
 
 
 # --- 2行目 ---
