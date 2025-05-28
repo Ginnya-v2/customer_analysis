@@ -3,8 +3,7 @@ import pandas as pd
 import os
 import matplotlib.pyplot as plt
 from matplotlib import font_manager
-# plt.rcParams['font.family'] = 'Hiragino Sans' #日本語フォントを指定（Mac）
-# plt.rcParams['font.family'] = 'MS Gothic' #日本語フォントを指定（Windows）
+
 
 # フォントパスを指定
 font_path = os.path.join(os.path.dirname(__file__), "Zen_Kaku_Gothic_New", "ZenKakuGothicNew-Regular.ttf")
